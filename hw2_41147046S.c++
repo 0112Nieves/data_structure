@@ -36,18 +36,6 @@ void set_sentence(dlink*& head, char c) {
     }
 }
 
-int length(dlink* head) {
-    if (!head) return 0;
-    int cnt = 0;
-    dlink* temp = head;
-    while(temp->rlink != nullptr){
-        cnt++;
-        cout << temp->c << endl;
-        temp = temp->rlink;
-    }
-    return cnt;
-}
-
 void printList(dlink* head) {
     if (!head) return;
     if(head->llink == nullptr){
@@ -135,10 +123,31 @@ void deleted(dlink*& head){
     }
 }
 
+void move_to_left(dlink*& head) {
+    if (head->c == '|') return;
+    dlink* now = head;
+    while (now->c != '|') {
+        now = now->rlink;
+    }
+    if(now->llink == head && now->rlink == head->rlink->rlink){
+        head = now;
+    }
+    dlink* leftNode = now->llink;
+    dlink* leftLeftNode = leftNode->llink;
+    
+    leftNode->rlink = now->rlink;
+    now->rlink->llink = leftNode;
+
+    now->llink = leftLeftNode;
+    leftLeftNode->rlink = now;
+
+    now->rlink = leftNode;
+    leftNode->llink = now;
+}
+
 int main() {
     dlink* head = nullptr;
     string str;
-
     cout << "Please enter an initial string consisting of a/A-z/Z and space: ";
     getline(cin, str);
     str.push_back('|');
@@ -153,12 +162,17 @@ int main() {
         cout << "Please choose what you want to do:\n"
                 "a/A-z/Z and space: insert a character (please click enter for every single alphabet and space)\n"
                 "0: delete\n"
+                "1: move to left\n"
                 "9: backspace\n"
                 "exit: exit\n";
         getline(cin, cmd);
         if (cmd == "exit") break;
         else if(cmd == "0"){
             deleted(head);
+            printList(head);
+        }
+        else if(cmd == "1"){
+            move_to_left(head);
             printList(head);
         }
         else if (cmd == "9"){
