@@ -37,7 +37,7 @@ void set_sentence(dlink*& head, char c) {
 }
 
 void printList(dlink* head) {
-    if (!head) return;
+    if(!head) return;
     if(head->llink == nullptr){
         cout << head->c << endl;
         return;
@@ -145,6 +145,27 @@ void move_to_left(dlink*& head) {
     leftNode->llink = now;
 }
 
+void move_to_right(dlink*& head) {
+    if (head->c == '|' || head->rlink == head) return;
+    dlink* now = head;
+    while (now->c != '|') {
+        now = now->rlink;
+    }
+    if (now->rlink == head) {
+        return;
+    }
+    dlink* rightNode = now->rlink;
+    dlink* rightRightNode = rightNode->rlink;
+    rightNode->llink = now->llink;
+    now->llink->rlink = rightNode;
+
+    now->rlink = rightRightNode;
+    rightRightNode->llink = now;
+
+    now->llink = rightNode;
+    rightNode->rlink = now;
+}
+
 int main() {
     dlink* head = nullptr;
     string str;
@@ -163,6 +184,7 @@ int main() {
                 "a/A-z/Z and space: insert a character (please click enter for every single alphabet and space)\n"
                 "0: delete\n"
                 "1: move to left\n"
+                "2: move to right\n"
                 "9: backspace\n"
                 "exit: exit\n";
         getline(cin, cmd);
@@ -173,6 +195,10 @@ int main() {
         }
         else if(cmd == "1"){
             move_to_left(head);
+            printList(head);
+        }
+        else if(cmd == "2"){
+            move_to_right(head);
             printList(head);
         }
         else if (cmd == "9"){
