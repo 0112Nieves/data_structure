@@ -36,6 +36,18 @@ void set_sentence(dlink*& head, char c) {
     }
 }
 
+int length(dlink* head) {
+    if (!head) return 0;
+    int cnt = 0;
+    dlink* temp = head;
+    while(temp->rlink != nullptr){
+        cnt++;
+        cout << temp->c << endl;
+        temp = temp->rlink;
+    }
+    return cnt;
+}
+
 void printList(dlink* head) {
     if (!head) return;
     if(head->llink == nullptr){
@@ -99,6 +111,30 @@ void backspace(dlink*& head) {
     delete now;
 }
 
+void deleted(dlink*& head){
+    if(head->c == '|') return;
+    else{
+        dlink* now = head;
+        while (now->rlink != head && now->c != '|') {
+            now = now->rlink;
+        }
+        if(now->rlink == head){
+            cout << "There are no character can delete.\n";
+            return;
+        }
+        else if(now->rlink->rlink == head){
+            cout << "the length is 2\n";
+            dlink* temp = now->rlink;
+            delete temp;
+        }
+        else{
+            now->rlink->llink = now->llink;
+            now->llink->rlink = now->rlink;
+            delete now;
+        }
+    }
+}
+
 int main() {
     dlink* head = nullptr;
     string str;
@@ -116,11 +152,16 @@ int main() {
     while (true) {
         cout << "Please choose what you want to do:\n"
                 "a/A-z/Z and space: insert a character (please click enter for every single alphabet and space)\n"
-                "0: backspace\n"
+                "0: delete\n"
+                "9: backspace\n"
                 "exit: exit\n";
         getline(cin, cmd);
         if (cmd == "exit") break;
-        else if (cmd == "0") {
+        else if(cmd == "0"){
+            deleted(head);
+            printList(head);
+        }
+        else if (cmd == "9"){
             backspace(head);
             printList(head);
         }
