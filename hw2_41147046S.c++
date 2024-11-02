@@ -126,12 +126,9 @@ void deleted(dlink*& head){
 void move_to_left(dlink*& head) {
     if (head->c == '|') return;
     dlink* now = head;
-    while (now->c != '|') {
-        now = now->rlink;
-    }
-    if(now->llink == head && now->rlink == head->rlink->rlink){
-        head = now;
-    }
+    while (now->c != '|') now = now->rlink;
+    if(now->llink == head && now->rlink == head->rlink->rlink) head = now;
+
     dlink* leftNode = now->llink;
     dlink* leftLeftNode = leftNode->llink;
     
@@ -146,14 +143,11 @@ void move_to_left(dlink*& head) {
 }
 
 void move_to_right(dlink*& head) {
-    if (head->c == '|' || head->rlink == head) return;
+    if(head->c == '|' && head->rlink == nullptr) return;
     dlink* now = head;
-    while (now->c != '|') {
-        now = now->rlink;
-    }
-    if (now->rlink == head) {
-        return;
-    }
+    while (now->c != '|') now = now->rlink;
+    if(now->rlink == head) return;
+    if(now->rlink == head->rlink) head = now->rlink;
     dlink* rightNode = now->rlink;
     dlink* rightRightNode = rightNode->rlink;
     rightNode->llink = now->llink;
@@ -185,6 +179,8 @@ int main() {
                 "0: delete\n"
                 "1: move to left\n"
                 "2: move to right\n"
+                "3: redo\n"
+                "4: undo\n"
                 "9: backspace\n"
                 "exit: exit\n";
         getline(cin, cmd);
@@ -206,11 +202,14 @@ int main() {
             printList(head);
         }
         else if (cmd.length() == 1) {
-            insert(head, cmd[0]);
-            printList(head);
+            if(isalpha(cmd[0])){
+                insert(head, cmd[0]);
+                printList(head);
+            }
+            else cout << "No such commend\n" << endl;
         }
         else {
-            cout << "Invalid command! Please enter a single character or '1' for backspace." << endl;
+            cout << "Invalid command!" << endl;
         }
     }
     return 0;
