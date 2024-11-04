@@ -23,6 +23,29 @@ dlink* create(char c) {
     return temp;
 }
 
+void push(char data, stack_pointer& head) {
+    stack_pointer newnode = new stack;
+    newnode->data = data;
+    newnode->link = head;
+    if (head != nullptr) {
+        head->link = newnode;
+    }
+    head = newnode;
+}
+
+char pop(stack_pointer& head) {
+    if (head == nullptr) {
+        cout << "Stack is empty!" << endl;
+        return '\0';
+    }
+
+    char data = head->data;
+    stack_pointer temp = head;
+    head = head->link;
+    delete temp;
+    return data;
+}
+
 void set_sentence(dlink*& head, char c) {
     dlink* newNode = create(c);
     if (!head) {
@@ -87,7 +110,7 @@ void insert(dlink*& head, char c) {
     }
 }
 
-void backspace(dlink*& head) {
+void backspace(dlink*& head, stack_pointer& bac) {
     if (!head) return;
     if(head->c == '|') return;
     dlink* now = head;
@@ -102,10 +125,11 @@ void backspace(dlink*& head) {
         head = now->rlink;
         head->llink = nullptr;
     }
+    push(now->c, bac);
     delete now;
 }
 
-void deleted(dlink*& head) {
+void deleted(dlink*& head, stack_pointer& del) {
     if (head->rlink == head && head->c == '|') return;
     dlink* now = head;
     while (now->rlink != head && now->c != '|') {
@@ -125,7 +149,7 @@ void deleted(dlink*& head) {
         now->rlink = toDelete->rlink;
         toDelete->rlink->llink = now;
     }
-    
+    push(toDelete->c, del);
     delete toDelete;
 }
 
@@ -169,37 +193,13 @@ void move_to_right(dlink*& head) {
     rightNode->rlink = now;
 }
 
-void push(char data, stack_pointer& head) {
-    stack_pointer newnode = new stack;
-    newnode->data = data;
-    newnode->link = head;
-    if (head != nullptr) {
-        head->link = newnode;
-    }
-    head = newnode;
-}
-
-char pop(stack_pointer& head) {
-    if (head == nullptr) {
-        cout << "Stack is empty!" << endl;
-        return '\0';
-    }
-
-    char data = head->data;
-    stack_pointer temp = head;
-    head = head->link;
-    delete temp;
-    return data;
-}
-
-
 int main() {
     dlink* head = nullptr;
     stack_pointer commend = nullptr;
     stack_pointer undo = nullptr;
-    stack_pointer ins = nullptr; //  insert
     stack_pointer del= nullptr; // delete
     stack_pointer bac = nullptr; // backspace
+    bool change = false;
     string str;
     cout << "Please enter an initial string consisting of a/A-z/Z and space: ";
     getline(cin, str);
@@ -229,17 +229,18 @@ int main() {
             push(cmd[0], undo);
             if(cmd == "1") cmd = "2";
             else if(cmd == "2") cmd = "1";
-            else if(cmd == "0") cmd = "";
-            else if(cmd == "9") cmd = "";
-            else{
-
+            else if(cmd == "0"){
+                cmd[0] = pop(del);
+                change = true;
             }
+            else if(cmd == "9") cmd[0] = pop(bac);
+            else cmd = "9";
         }
         else push(cmd[0], commend);
 
         if (cmd == "exit") break;
         else if(cmd == "0"){
-            deleted(head);
+            deleted(head, del);
             printList(head);
         }
         else if(cmd == "1"){
@@ -251,14 +252,17 @@ int main() {
             printList(head);
         }
         else if(cmd == "9"){
-            backspace(head);
+            backspace(head, bac);
             printList(head);
         }
         // insert
         else if(cmd.length() == 1) {
             if(isalpha(cmd[0])){
                 insert(head, cmd[0]);
-                push(cmd[0], ins);
+                if(change){
+                    move_to_left(head);
+                    change = false;
+                }
                 printList(head);
             }
             else cout << "No such commend\n" << endl;
