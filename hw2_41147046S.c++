@@ -131,10 +131,13 @@ void deleted(dlink*& head) {
 
 void move_to_left(dlink*& head) {
     if (head->c == '|') return;
+
     dlink* now = head;
     while (now->c != '|') now = now->rlink;
-    if(now->llink == head && now->rlink == head->rlink->rlink) head = now;
-
+    if (now->llink == now->rlink) {
+        head = now;
+        return;
+    }
     dlink* leftNode = now->llink;
     dlink* leftLeftNode = leftNode->llink;
     
