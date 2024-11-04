@@ -222,7 +222,7 @@ int main() {
                 "exit: exit\n";
         getline(cin, cmd);
         if(cmd == "3"){
-
+            cmd[0] = pop(undo);
         }
         else if(cmd == "4"){
             cmd[0] = pop(commend);
@@ -238,7 +238,7 @@ int main() {
         }
         else push(cmd[0], commend);
 
-        if (cmd == "exit") break;
+        if (cmd[0] == 27) break;
         else if(cmd == "0"){
             deleted(head, del);
             printList(head);
