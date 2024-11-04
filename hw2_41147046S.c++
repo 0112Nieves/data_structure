@@ -9,6 +9,12 @@ typedef struct dlink {
     pointer llink;
 } dlink;
 
+typedef struct stack* stack_pointer;
+typedef struct stack{
+    char data;
+    stack_pointer link;
+} stack;
+
 dlink* create(char c) {
     dlink* temp = new dlink;
     temp->c = c;
@@ -99,28 +105,28 @@ void backspace(dlink*& head) {
     delete now;
 }
 
-void deleted(dlink*& head){
-    if(head->c == '|') return;
-    else{
-        dlink* now = head;
-        while (now->rlink != head && now->c != '|') {
-            now = now->rlink;
-        }
-        if(now->rlink == head){
-            cout << "There are no character can delete.\n";
-            return;
-        }
-        else if(now->rlink->rlink == head){
-            cout << "the length is 2\n";
-            dlink* temp = now->rlink;
-            delete temp;
-        }
-        else{
-            now->rlink->llink = now->llink;
-            now->llink->rlink = now->rlink;
-            delete now;
-        }
+void deleted(dlink*& head) {
+    if (head->rlink == head && head->c == '|') return;
+    dlink* now = head;
+    while (now->rlink != head && now->c != '|') {
+        now = now->rlink;
     }
+
+    if (now->rlink == head) {
+        cout << "There are no characters that can be deleted.\n";
+        return;
+    }
+    dlink* toDelete = now->rlink;
+    if (toDelete->rlink == head) {
+        now->rlink = head;
+        head->llink = now;
+    }
+    else {
+        now->rlink = toDelete->rlink;
+        toDelete->rlink->llink = now;
+    }
+    
+    delete toDelete;
 }
 
 void move_to_left(dlink*& head) {
@@ -160,8 +166,37 @@ void move_to_right(dlink*& head) {
     rightNode->rlink = now;
 }
 
+void push(char data, stack_pointer& head) {
+    stack_pointer newnode = new stack;
+    newnode->data = data;
+    newnode->link = head;
+    if (head != nullptr) {
+        head->link = newnode;
+    }
+    head = newnode;
+}
+
+char pop(stack_pointer& head) {
+    if (head == nullptr) {
+        cout << "Stack is empty!" << endl;
+        return '\0';
+    }
+
+    char data = head->data;
+    stack_pointer temp = head;
+    head = head->link;
+    delete temp;
+    return data;
+}
+
+
 int main() {
     dlink* head = nullptr;
+    stack_pointer commend = nullptr;
+    stack_pointer undo = nullptr;
+    stack_pointer ins = nullptr; //  insert
+    stack_pointer del= nullptr; // delete
+    stack_pointer bac = nullptr; // backspace
     string str;
     cout << "Please enter an initial string consisting of a/A-z/Z and space: ";
     getline(cin, str);
@@ -171,7 +206,6 @@ int main() {
     }
     cout << "The double linked list is: ";
     printList(head);
-
     string cmd;
     while (true) {
         cout << "Please choose what you want to do:\n"
@@ -184,6 +218,22 @@ int main() {
                 "9: backspace\n"
                 "exit: exit\n";
         getline(cin, cmd);
+        if(cmd == "3"){
+
+        }
+        else if(cmd == "4"){
+            cmd[0] = pop(commend);
+            push(cmd[0], undo);
+            if(cmd == "1") cmd = "2";
+            else if(cmd == "2") cmd = "1";
+            else if(cmd == "0") cmd = "";
+            else if(cmd == "9") cmd = "";
+            else{
+
+            }
+        }
+        else push(cmd[0], commend);
+
         if (cmd == "exit") break;
         else if(cmd == "0"){
             deleted(head);
@@ -197,13 +247,15 @@ int main() {
             move_to_right(head);
             printList(head);
         }
-        else if (cmd == "9"){
+        else if(cmd == "9"){
             backspace(head);
             printList(head);
         }
-        else if (cmd.length() == 1) {
+        // insert
+        else if(cmd.length() == 1) {
             if(isalpha(cmd[0])){
                 insert(head, cmd[0]);
+                push(cmd[0], ins);
                 printList(head);
             }
             else cout << "No such commend\n" << endl;
