@@ -211,15 +211,15 @@ int main() {
     printList(head);
     string cmd;
     while (true) {
-        cout << "Please choose what you want to do:\n"
-                "a/A-z/Z and space: insert a character (please click enter for every single alphabet and space)\n"
+        cout << "Please choose what you want to do: (please click enter for every single alphabet and space)\n"
+                "a/A-z/Z and space: insert a character\n"
                 "0: delete\n"
                 "1: move to left\n"
                 "2: move to right\n"
                 "3: redo\n"
                 "4: undo\n"
                 "9: backspace\n"
-                "exit: exit\n";
+                "esc: exit\n";
         getline(cin, cmd);
         if(cmd == "3"){
             cmd[0] = pop(undo);
@@ -255,9 +255,13 @@ int main() {
             backspace(head, bac);
             printList(head);
         }
+        else if(cmd[0] == '\0'){
+            printList(head);
+            continue;
+        }
         // insert
         else if(cmd.length() == 1) {
-            if(isalpha(cmd[0])){
+            if(isalpha(cmd[0]) || cmd[0] == 32){
                 insert(head, cmd[0]);
                 if(change){
                     move_to_left(head);
