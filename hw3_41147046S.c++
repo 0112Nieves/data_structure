@@ -3,6 +3,7 @@
 #include <cctype>
 #include <string>
 #include <queue>
+#include <map>
 using namespace std;
 
 struct Node {
@@ -103,12 +104,15 @@ void levelOrder(Node* root) {
     }
 }
 
-void postOrder(Node* root){
+void postOrder(Node* root, string& expression) {
     if (root == nullptr) return;
-    postOrder(root->left);
-    postOrder(root->right);
+    
+    postOrder(root->left, expression);
+    postOrder(root->right, expression);
     cout << root->data;
+    expression += root->data;
 }
+
 
 void preOrder(Node* root){
     if(root == nullptr) return;
@@ -117,40 +121,83 @@ void preOrder(Node* root){
     preOrder(root->right);
 }
 
+int evaluate(const string& expression, map<char, int>& num) {
+    stack<int> s;
+    
+    for (char c : expression) {
+        if (num.find(c) != num.end()) s.push(num[c]);
+        else {
+            int right = s.top(); s.pop();
+            int left = s.top(); s.pop();
+            switch (c) {
+                case '+': s.push(left + right); break;
+                case '-': s.push(left - right); break;
+                case '*': s.push(left * right); break;
+                case '/': s.push(left / right); break;
+                default: break;
+            }
+        }
+    }
+
+    return s.top();
+}
+
+
 int main()
 {
+    printf("Please enter an infix expression and press enter:");
     while(1){
-        string str;
+        string str = "";
+        string expression = "";
+        priority_queue<char, vector<char>, greater<char>> alpha;
+        map<char, int> num;
         bool ok = true;
-        printf("Please enter an infix expression and press enter:");
         if(!getline(cin, str)){
             printf("Error reading input.\n");
             continue;
         }
-        // int cnt = 0;
-        // for(int i = 0; i < str.length(); i++){
-        //     if(isspace(str[i])){
-        //         printf("input shoudn't have any space\n");
-        //         ok = false;
-        //         break;
-        //     }
-        //     if(isalpha(str[i])) cnt++;
-        // }
+        if (str[0] == 27) break; // esc
+        int cnt = 0;
+        for(int i = 0; i < str.length(); i++){
+            if(isspace(str[i])){
+                printf("input shoudn't have any space\n");
+                ok = false;
+                break;
+            }
+            if(isalpha(str[i])){
+                cnt++;
+                alpha.push(str[i]);
+            }
+        }
         // if(cnt < 5 || cnt > 20){
         //     cout << "there should be 5~20 operand in operational expression\n";
         //     ok = false;
         // }
+        int temp;
+        for(int i = 0; i < cnt; i++){
+            char c = alpha.top();
+            alpha.pop();
+            cout << c << " = ?";
+            cin >> temp;
+            num[c] = temp;
+        }
         if(ok){
             Node* root = constructTree(str);
             cout << "The level-order of the expression tree:" << endl;
             levelOrder(root);
             cout << "The postfix expression: " ;
-            postOrder(root);
+            postOrder(root, expression);
             cout << endl;
             cout << "The prefix expression: ";
             preOrder(root);
             cout << endl;
+            char eval;
+            cin >> eval;
+            if(eval == '='){
+                cout << evaluate(expression, num) << endl;
+            } 
         }
+        printf("Please enter an infix expression and press enter:");
     }
     
     return 0;
