@@ -110,6 +110,13 @@ void postOrder(Node* root){
     cout << root->data;
 }
 
+void preOrder(Node* root){
+    if(root == nullptr) return;
+    cout << root->data;
+    preOrder(root->left);
+    preOrder(root->right);
+}
+
 int main()
 {
     while(1){
@@ -139,6 +146,9 @@ int main()
             levelOrder(root);
             cout << "The postfix expression: " ;
             postOrder(root);
+            cout << endl;
+            cout << "The prefix expression: ";
+            preOrder(root);
             cout << endl;
         }
     }
