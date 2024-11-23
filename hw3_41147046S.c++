@@ -3,6 +3,7 @@
 #include <cctype>
 #include <string>
 #include <queue>
+#include <bool>
 using namespace std;
 
 struct Node {
@@ -107,13 +108,27 @@ int main()
 {
     while(1){
         string str;
+        bool ok = true;
         printf("Please enter an infix expression and press enter:");
         if(!getline(cin, str)){
             printf("Error reading input.\n");
             continue;
         }
-        Node* root = constructTree(str);
-        levelOrder(root);
+        int cnt = 0;
+        for(int i = 0; i < str.length(); i++){
+            if(isspace(str[i])){
+                printf("input shoudn't have space\n");
+                ok = false;
+                break;
+            }
+            if(isalpha(str[i])) cnt++;
+        }
+        if(cnt < 5 || cnt > 20) ok = false;
+        if(ok){
+            Node* root = constructTree(str);
+            cout << "The level-order of the expression tree:" << endl;
+            levelOrder(root);
+        }
     }
     
     return 0;
