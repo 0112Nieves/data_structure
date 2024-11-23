@@ -3,7 +3,6 @@
 #include <cctype>
 #include <string>
 #include <queue>
-#include <bool>
 using namespace std;
 
 struct Node {
@@ -104,6 +103,13 @@ void levelOrder(Node* root) {
     }
 }
 
+void postOrder(Node* root){
+    if (root == nullptr) return;
+    postOrder(root->left);
+    postOrder(root->right);
+    cout << root->data;
+}
+
 int main()
 {
     while(1){
@@ -114,20 +120,26 @@ int main()
             printf("Error reading input.\n");
             continue;
         }
-        int cnt = 0;
-        for(int i = 0; i < str.length(); i++){
-            if(isspace(str[i])){
-                printf("input shoudn't have space\n");
-                ok = false;
-                break;
-            }
-            if(isalpha(str[i])) cnt++;
-        }
-        if(cnt < 5 || cnt > 20) ok = false;
+        // int cnt = 0;
+        // for(int i = 0; i < str.length(); i++){
+        //     if(isspace(str[i])){
+        //         printf("input shoudn't have any space\n");
+        //         ok = false;
+        //         break;
+        //     }
+        //     if(isalpha(str[i])) cnt++;
+        // }
+        // if(cnt < 5 || cnt > 20){
+        //     cout << "there should be 5~20 operand in operational expression\n";
+        //     ok = false;
+        // }
         if(ok){
             Node* root = constructTree(str);
             cout << "The level-order of the expression tree:" << endl;
             levelOrder(root);
+            cout << "The postfix expression: " ;
+            postOrder(root);
+            cout << endl;
         }
     }
     
