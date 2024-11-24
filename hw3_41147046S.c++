@@ -4,6 +4,7 @@
 #include <string>
 #include <queue>
 #include <map>
+#include <limits>
 using namespace std;
 
 struct Node {
@@ -146,46 +147,45 @@ int evaluate(const string& expression, map<char, int>& num) {
 int main()
 {
     printf("Please enter an infix expression and press enter:");
-    while(1){
+    while (1) {
         string str = "";
         string expression = "";
         priority_queue<char, vector<char>, greater<char>> alpha;
         map<char, int> num;
         bool ok = true;
-        if(!getline(cin, str)){
-            printf("Error reading input.\n");
+
+        if (!getline(cin, str) || str.empty()) {
+            printf("Error reading input or empty input.\n");
             continue;
         }
         if (str[0] == 27) break; // esc
         int cnt = 0;
-        for(int i = 0; i < str.length(); i++){
-            if(isspace(str[i])){
-                printf("input shoudn't have any space\n");
+        for (int i = 0; i < str.length(); i++) {
+            if (isspace(str[i])) {
+                printf("Input shouldn't have any space\n");
                 ok = false;
                 break;
             }
-            if(isalpha(str[i])){
+            if (isalpha(str[i])) {
                 cnt++;
                 alpha.push(str[i]);
             }
         }
-        // if(cnt < 5 || cnt > 20){
-        //     cout << "there should be 5~20 operand in operational expression\n";
-        //     ok = false;
-        // }
+        if (!ok) continue;
         int temp;
-        for(int i = 0; i < cnt; i++){
+        for (int i = 0; i < cnt; i++) {
             char c = alpha.top();
             alpha.pop();
             cout << c << " = ?";
             cin >> temp;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             num[c] = temp;
         }
-        if(ok){
+        if (ok) {
             Node* root = constructTree(str);
             cout << "The level-order of the expression tree:" << endl;
             levelOrder(root);
-            cout << "The postfix expression: " ;
+            cout << "The postfix expression: ";
             postOrder(root, expression);
             cout << endl;
             cout << "The prefix expression: ";
@@ -193,12 +193,12 @@ int main()
             cout << endl;
             char eval;
             cin >> eval;
-            if(eval == '='){
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            if (eval == '=') {
                 cout << evaluate(expression, num) << endl;
-            } 
+            }
         }
         printf("Please enter an infix expression and press enter:");
     }
-    
     return 0;
 }
