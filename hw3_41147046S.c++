@@ -171,17 +171,20 @@ int main()
                 alpha.push(str[i]);
             }
         }
-        if (!ok) continue;
-        int temp;
-        for (int i = 0; i < cnt; i++) {
-            char c = alpha.top();
-            alpha.pop();
-            cout << c << " = ?";
-            cin >> temp;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            num[c] = temp;
+        if((cnt < 5 || cnt > 20) && ok){
+            cout << "there should be 5~20 operand in operational expression\n";
+            ok = false;
         }
         if (ok) {
+            int temp;
+            for (int i = 0; i < cnt; i++) {
+                char c = alpha.top();
+                alpha.pop();
+                cout << c << " = ?";
+                cin >> temp;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                num[c] = temp;
+            }
             Node* root = constructTree(str);
             cout << "The level-order of the expression tree:" << endl;
             levelOrder(root);
